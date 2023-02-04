@@ -6,7 +6,7 @@ import { useContractInfiniteReads, paginatedIndexesConfig } from "wagmi";
 import factoryABI from "../../abi/factory.json";
 
 const factoryContractConfig = {
-  address: "0x38c8A563b4873FEEd2B3a592bA08ce8BAE59Df8d",
+  address: "0xCF15c0eF3f8EdE35C2CFa1ca5395Ef5644A7eFD2",
   abi: factoryABI,
 };
 
