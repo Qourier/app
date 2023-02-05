@@ -13,119 +13,6 @@ import { Prism } from "@mantine/prism";
 
 import moment from "moment";
 
-export default function Hub() {
-  const { address } = useAccount();
-
-  let { hubAddress: hub } = useParams();
-
-  const hubContractConfig: any = {
-    address: hub,
-    abi: hubABI,
-  };
-
-  const { data: getBalance }: any = useContractRead({
-    ...hubContractConfig,
-    functionName: "getBalance",
-    args: [address],
-  });
-
-  const { data: getHub }: any = useContractRead({
-    ...hubContractConfig,
-    functionName: "getHub",
-  });
-
-  const { data } = useContractInfiniteReads({
-    cacheKey: "hubAttributes",
-    ...paginatedIndexesConfig(
-      (index: any): any => {
-        return [
-          {
-            ...hubContractConfig,
-            functionName: "getTask",
-            args: [ethers.BigNumber.from(index)] as const,
-          },
-        ];
-      },
-      { start: 1, perPage: 10, direction: "increment" }
-    ),
-    cacheTime: 2_000,
-  });
-
-  const [personal, task_id, price, modules] = getHub || [];
-
-  return (
-    <>
-      {getBalance && (
-        <div>
-          <hr></hr>
-          {ethers.utils.formatEther(getBalance)}
-          <hr></hr>
-        </div>
-      )}
-      {personal && (
-        <div>
-          <div>hub: {hub}</div>
-          <div>personal: {personal}</div>
-          <div>task_id: {task_id.toString()}</div>
-          <div>price: {price.toString()}</div>
-          <div>
-            {modules.map((module: any) => {
-              if (module === ethers.constants.HashZero) return;
-              return (
-                <div key={hub + module}>
-                  module: {ethers.utils.parseBytes32String(module)}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-      <hr></hr>
-      {data &&
-        data.pages &&
-        data.pages.map((page) =>
-          page.map((item, i) => {
-            if (!item) return;
-            const [
-              module,
-              params,
-              result,
-              callback,
-              qourier,
-              tasks,
-              createdAt,
-              completedAt,
-            ]: any = item;
-            return (
-              <div key={i}>
-                <div>module: {ethers.utils.parseBytes32String(module)}</div>
-                <div>
-                  qourier: <Link to={`/hub/${hub}/${qourier}`}>{qourier}</Link>
-                </div>
-                <div>
-                  {params.map((param: any, j: any) => {
-                    if (!ethers.utils.toUtf8String(param)) return;
-                    return (
-                      <div key={j}>
-                        param: {ethers.utils.toUtf8String(param)}
-                      </div>
-                    );
-                  })}
-                </div>
-                <div>result: {ethers.utils.toUtf8String(result)}</div>
-                <div>callback: {callback}</div>
-                <div>tasks: {tasks.toString()}</div>
-                <div>createdAt: {createdAt.toString()}</div>
-                <div>completedAt: {completedAt.toString()}</div>
-                <hr></hr>
-              </div>
-            );
-          })
-        )}
-    </>
-  );
-}
-
 import {
   createStyles,
   Title,
@@ -378,7 +265,7 @@ interface CardGradientProps {
   description: string;
 }
 
-export function FaqWithHeader() {
+export default function Hub() {
   const { classes } = useStyles();
   const { classes: cl2 } = useStyles3();
 
@@ -397,7 +284,7 @@ export function FaqWithHeader() {
     args: [address],
   });
   const userBalance =
-    getBalance && getBalance.gt(ethers.BigNumber.from(0))
+    getBalance && getBalance.gt(ethers.BigNumber.from("0"))
       ? ethers.utils.formatEther(getBalance)
       : "";
 
@@ -414,7 +301,7 @@ export function FaqWithHeader() {
           {
             ...hubContractConfig,
             functionName: "getTask",
-            args: [ethers.BigNumber.from(index)] as const,
+            args: [ethers.BigNumber.from(index || "0")] as const,
           },
         ];
       },
@@ -425,7 +312,7 @@ export function FaqWithHeader() {
 
   const [personal, task_id, price, modules] = getHub || [];
   const notTasks =
-    task_id && task_id.gt(ethers.BigNumber.from(0)) ? false : true;
+    task_id && task_id.gt(ethers.BigNumber.from("0")) ? false : true;
 
   const dataInfo = [
     {
@@ -484,8 +371,8 @@ Hub(
             {modules
               .map((m: any) => ethers.utils.parseBytes32String(m))
               .filter((m: any) => !!m)
-              .map((m: any) => (
-                <List.Item>
+              .map((m: any, i: any) => (
+                <List.Item key={i}>
                   <Code color="cyan">{m}</Code>
                 </List.Item>
               ))}
@@ -602,41 +489,50 @@ Hub(
                   createdAt,
                   completedAt,
                 ]: any = item;
-                const left = tasks.gt(ethers.BigNumber.from(1))
-                  ? ` (paid ${tasks.toString()} tasks)`
-                  : "";
+                const left =
+                  tasks && tasks.gt(ethers.BigNumber.from("1"))
+                    ? ` (paid ${tasks.toString()} tasks)`
+                    : "";
                 const complete =
                   qourier === ethers.constants.AddressZero ? 2 : 3;
-                const createTime = moment(
-                  new Date(
-                    parseInt(
-                      createdAt.mul(ethers.BigNumber.from(1000)).toString()
-                    )
-                  )
-                ).fromNow();
-                const completeTime = completedAt.gt(ethers.BigNumber.from(0))
+                const createTime = createdAt
                   ? moment(
                       new Date(
                         parseInt(
-                          completedAt
-                            .mul(ethers.BigNumber.from(1000))
+                          createdAt
+                            .mul(ethers.BigNumber.from("1000"))
                             .toString()
                         )
                       )
-                    ).from(
-                      new Date(
-                        parseInt(
-                          createdAt.mul(ethers.BigNumber.from(1000)).toString()
+                    ).fromNow()
+                  : "---";
+                const completeTime =
+                  completedAt && completedAt.gt(ethers.BigNumber.from("0"))
+                    ? moment(
+                        new Date(
+                          parseInt(
+                            completedAt
+                              .mul(ethers.BigNumber.from("1000"))
+                              .toString()
+                          )
+                        )
+                      ).from(
+                        new Date(
+                          parseInt(
+                            createdAt
+                              .mul(ethers.BigNumber.from("1000"))
+                              .toString()
+                          )
                         )
                       )
-                    )
-                  : "---";
+                    : "---";
                 module = ethers.utils.parseBytes32String(module);
                 params = params.map(ethers.utils.toUtf8String).filter(Boolean);
                 result = ethers.utils.toUtf8String(result);
 
                 return (
                   <Timeline.Item
+                    key={i}
                     active={true}
                     title={
                       <Divider

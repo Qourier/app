@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { useContractInfiniteReads, paginatedIndexesConfig } from "wagmi";
 import factoryABI from "../../abi/factory.json";
 
@@ -34,7 +34,7 @@ export default function App() {
           {
             ...factoryContractConfig,
             functionName: "getHubById",
-            args: [BigNumber.from(index)] as const,
+            args: [ethers.BigNumber.from(index)] as const,
           },
         ];
       },
@@ -91,10 +91,11 @@ export default function App() {
                   <Center>
                     <Tooltip.Group openDelay={300} closeDelay={100}>
                       <Avatar.Group spacing="sm">
-                        {modules.map((module: any) => {
+                        {modules.map((module: any, i: any) => {
                           if (module === ethers.constants.HashZero) return;
                           return (
                             <Tooltip
+                              key={i}
                               label={ethers.utils.parseBytes32String(module)}
                               withArrow
                             >

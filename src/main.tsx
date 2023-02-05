@@ -10,8 +10,7 @@ import { client } from "./wagmi";
 
 import Layout from "./routes/layout";
 import App from "./routes/app";
-import Hub, { FaqWithHeader } from "./routes/hub";
-import Qourier from "./routes/qourier";
+import Hub from "./routes/hub";
 import Index from "./routes/index";
 
 const router = createHashRouter([
@@ -29,7 +28,7 @@ const router = createHashRouter([
       },
       {
         path: "/hub/:hubAddress",
-        element: <FaqWithHeader />,
+        element: <Hub />,
       },
     ],
   },
