@@ -7,10 +7,6 @@ import {
 } from "wagmi";
 import hubABI from "../../abi/hub.json";
 
-export async function loader({ params }: { params: any }) {
-  return params;
-}
-
 export default function Qourier() {
   let { hubAddress: hub, qourierAddress: qourier }: any = useParams();
 

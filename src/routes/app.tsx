@@ -1,24 +1,31 @@
-import { ConnectKitButton } from "connectkit";
-import { useAccount } from "wagmi";
 import { Link } from "react-router-dom";
 import { BigNumber, ethers } from "ethers";
 import { useContractInfiniteReads, paginatedIndexesConfig } from "wagmi";
 import factoryABI from "../../abi/factory.json";
 
+import {
+  Avatar,
+  Badge,
+  Table,
+  Group,
+  Text,
+  Select,
+  ScrollArea,
+  Container,
+  Anchor,
+  Button,
+  Tooltip,
+  Center,
+} from "@mantine/core";
+
+import { IconDoorEnter, IconDoorOff } from "@tabler/icons-react";
+
 const factoryContractConfig = {
-  address: "0xCF15c0eF3f8EdE35C2CFa1ca5395Ef5644A7eFD2",
+  address: "0x0450e8b9166f1067a414fde415735255E27Ab8Fc",
   abi: factoryABI,
 };
 
-import { Account } from "../components";
-
-export async function loader({ params }: { params: any }) {
-  return params;
-}
-
 export default function App() {
-  const { isConnected } = useAccount();
-
   const { data } = useContractInfiniteReads({
     cacheKey: "factoryAttributes",
     ...paginatedIndexesConfig(
@@ -36,40 +43,106 @@ export default function App() {
     cacheTime: 2_000,
   });
 
-  return (
-    <>
-      <h1>Qourier</h1>
-      <ConnectKitButton />
-      {isConnected && <Account />}
-      <hr></hr>
-      {data &&
-        data.pages &&
-        data.pages.map((page) =>
-          page.map((item) => {
+  const rows =
+    data && data.pages && Array.isArray(data.pages)
+      ? data.pages.map((page) => {
+          if (!page) return;
+          return page.map((item, i) => {
             if (!item) return;
-            const [hub, personal, task_id, price, modules]: any = item;
+            let [hub, personal, task_id, price, modules]: any = item;
+            const open = personal === ethers.constants.AddressZero;
             return (
-              <div key={hub}>
-                <div>
-                  hub: <Link to={`/${hub}`}>{hub}</Link>
-                </div>
-                <div>personal: {personal}</div>
-                <div>task_id: {task_id.toString()}</div>
-                <div>price: {price.toString()}</div>
-                <div>
-                  {modules.map((module: any) => {
-                    if (module === ethers.constants.HashZero) return;
-                    return (
-                      <div key={hub + module}>
-                        module: {ethers.utils.parseBytes32String(module)}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+              <tr key={hub + i}>
+                <td>
+                  <Center>
+                    {open ? (
+                      <Avatar color="green" radius="sm">
+                        <IconDoorEnter />
+                      </Avatar>
+                    ) : (
+                      <Avatar color="red" radius="sm">
+                        <IconDoorOff />
+                      </Avatar>
+                    )}
+                  </Center>
+                </td>
+                <td>
+                  <Center>
+                    <Link to={`/hub/${hub}`}>
+                      <Button variant="subtle" size="sm">
+                        {hub}
+                      </Button>
+                    </Link>
+                  </Center>
+                </td>
+                <td>
+                  <Center>
+                    <Badge color="indigo">{task_id.toString()}</Badge>
+                  </Center>
+                </td>
+                <td>
+                  <Center>
+                    <Badge color="orange">
+                      {ethers.utils.formatEther(price)} tFIL
+                    </Badge>
+                  </Center>
+                </td>
+                <td>
+                  <Center>
+                    <Tooltip.Group openDelay={300} closeDelay={100}>
+                      <Avatar.Group spacing="sm">
+                        {modules.map((module: any) => {
+                          if (module === ethers.constants.HashZero) return;
+                          return (
+                            <Tooltip
+                              label={ethers.utils.parseBytes32String(module)}
+                              withArrow
+                            >
+                              <Avatar radius="xl" color="teal">
+                                {ethers.utils
+                                  .parseBytes32String(module)
+                                  .slice(0, 2)
+                                  .toUpperCase()}
+                              </Avatar>
+                            </Tooltip>
+                          );
+                        })}
+                      </Avatar.Group>
+                    </Tooltip.Group>
+                  </Center>
+                </td>
+              </tr>
             );
-          })
+          });
+        })
+      : "";
+
+  return (
+    <Container size="md">
+      <ScrollArea>
+        {rows && (
+          <Table sx={{ minWidth: 800 }} verticalSpacing="sm" withColumnBorders>
+            <thead>
+              <tr>
+                <th>
+                  <Center>Open</Center>
+                </th>
+                <th></th>
+                <th>
+                  <Center>Tasks</Center>
+                </th>
+                <th>
+                  <Center>Parice</Center>
+                </th>
+                <th>
+                  <Center>Modules</Center>
+                </th>
+              </tr>
+            </thead>
+            <tbody>{rows}</tbody>
+          </Table>
         )}
-    </>
+      </ScrollArea>
+    </Container>
   );
 }
