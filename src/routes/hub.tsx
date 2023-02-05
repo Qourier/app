@@ -322,10 +322,14 @@ export default function Hub() {
     },
     {
       title: "Price",
-      description: `${ethers.utils.formatEther(price)} tFIL`,
+      description: `${price ? ethers.utils.formatEther(price) : 0} tFIL`,
       icon: IconReceipt2,
     },
-    { title: "Tasks", description: task_id.toString(), icon: IconListCheck },
+    {
+      title: "Tasks",
+      description: task_id ? task_id.toString() : "0",
+      icon: IconListCheck,
+    },
   ];
 
   const { classes: cl } = useStyles2();
