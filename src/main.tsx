@@ -10,7 +10,7 @@ import { client } from "./wagmi";
 
 import Layout from "./routes/layout";
 import App from "./routes/app";
-import Hub from "./routes/hub2";
+import Hub from "./routes/hub";
 import Index from "./routes/index";
 
 const router = createHashRouter([
