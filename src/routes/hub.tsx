@@ -371,16 +371,18 @@ Hub(
     <Container className={classes.wrapper} size="lg">
       <div className={classes.header}>
         <Title className={classes.title}>
-          <List spacing="xs" size="xs" listStyleType="none" center>
-            {modules
-              .map((m: any) => ethers.utils.parseBytes32String(m))
-              .filter((m: any) => !!m)
-              .map((m: any, i: any) => (
-                <List.Item key={i}>
-                  <Code color="cyan">{m}</Code>
-                </List.Item>
-              ))}
-          </List>
+          {modules && (
+            <List spacing="xs" size="xs" listStyleType="none" center>
+              {modules
+                .map((m: any) => ethers.utils.parseBytes32String(m))
+                .filter((m: any) => !!m)
+                .map((m: any, i: any) => (
+                  <List.Item key={i}>
+                    <Code color="cyan">{m}</Code>
+                  </List.Item>
+                ))}
+            </List>
+          )}
           {userBalance && (
             <Button
               color="cyan"
