@@ -1,5 +1,5 @@
-import { Outlet, Link, useParams } from "react-router-dom";
-import { BigNumber, ethers } from "ethers";
+import { Link, useParams } from "react-router-dom";
+import { ethers } from "ethers";
 import {
   useContractInfiniteReads,
   paginatedIndexesConfig,
@@ -42,7 +42,7 @@ export default function Hub() {
           {
             ...hubContractConfig,
             functionName: "getTask",
-            args: [BigNumber.from(index)] as const,
+            args: [ethers.BigNumber.from(index)] as const,
           },
         ];
       },
@@ -414,7 +414,7 @@ export function FaqWithHeader() {
           {
             ...hubContractConfig,
             functionName: "getTask",
-            args: [BigNumber.from(index)] as const,
+            args: [ethers.BigNumber.from(index)] as const,
           },
         ];
       },
