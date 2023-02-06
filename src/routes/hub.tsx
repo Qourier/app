@@ -399,7 +399,7 @@ Hub(
           )}
         </Title>
         <Title className={classes.titleOverlay} role="presentation">
-          HUB {hub?.slice(0, 4)}..
+          HUB
         </Title>
 
         <div className={classes.contact}>
