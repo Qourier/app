@@ -482,8 +482,9 @@ Hub(
         <Timeline bulletSize={24} lineWidth={5} color="cyan">
           {data &&
             data.pages &&
-            data.pages.map((page) =>
-              page.map((item, i) => {
+            data.pages.map((page) => {
+              if (!page) return;
+              return page.map((item, i) => {
                 if (!item) return;
                 let [
                   module,
@@ -500,7 +501,7 @@ Hub(
                     ? ` (paid ${tasks.toString()} tasks)`
                     : "";
                 const complete =
-                  qourier === ethers.constants.AddressZero ? 2 : 3;
+                  qourier && qourier === ethers.constants.AddressZero ? 2 : 3;
                 const createTime = createdAt
                   ? moment(
                       new Date(
@@ -532,10 +533,19 @@ Hub(
                         )
                       )
                     : "---";
-                module = ethers.utils.parseBytes32String(module);
-                params = params.map(ethers.utils.toUtf8String).filter(Boolean);
-                result = ethers.utils.toUtf8String(result);
-
+                module = module ? ethers.utils.parseBytes32String(module) : "";
+                params = params
+                  ? params
+                      .map((p: any) => {
+                        if (ethers.utils.isAddress(p)) {
+                          return p;
+                        } else {
+                          return ethers.utils.toUtf8String(p);
+                        }
+                      })
+                      .filter(Boolean)
+                  : [];
+                result = result ? ethers.utils.toUtf8String(result) : "";
                 return (
                   <Timeline.Item
                     key={i}
@@ -550,7 +560,7 @@ Hub(
                         label={
                           <>
                             <IconPhoneCall size={12} />
-                            <Box ml={5}>{callback}</Box>
+                            <Box ml={5}>{callback || ""}</Box>
                           </>
                         }
                       />
@@ -591,7 +601,8 @@ Hub(
                         <tr>
                           <td>Qourier</td>
                           <td>
-                            {qourier !== ethers.constants.AddressZero ? (
+                            {qourier &&
+                            qourier !== ethers.constants.AddressZero ? (
                               <Code color="lime">{qourier}</Code>
                             ) : (
                               "..."
@@ -617,8 +628,8 @@ Hub(
                     </Stepper>
                   </Timeline.Item>
                 );
-              })
-            )}
+              });
+            })}
         </Timeline>
       )}
     </Container>
