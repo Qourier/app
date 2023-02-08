@@ -133,7 +133,7 @@ export default function App() {
                   <Center>Tasks</Center>
                 </th>
                 <th>
-                  <Center>Parice</Center>
+                  <Center>Price</Center>
                 </th>
                 <th>
                   <Center>Modules</Center>
